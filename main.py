@@ -17,8 +17,10 @@ def create_plot(train_y: list, test_y: list, tittle=''):
     plt.plot(x, train_y, marker='o', markersize=4, label='test')
     plt.plot(x, test_y, marker='o', markersize=4, label='train')
 
-    plt.xticks(np.arange(0, len(x)+1, 1))
-    plt.yticks(np.arange(0.9, 1.01, 0.01))
+    min_x, max_x, step_x = 0, len(x)+1, 1
+    min_y, max_y, step_y = 0.9, 1.01, 0.01
+    plt.xticks(np.arange(min_x, max_x, step_x))
+    plt.yticks(np.arange(min_y, max_y, step_y))
     plt.grid()
 
     plt.title(tittle)
@@ -29,7 +31,8 @@ def create_plot(train_y: list, test_y: list, tittle=''):
     plt.savefig('graph/' + tittle + '_graph.png', dpi=300, bbox_inches='tight')
 
 def run_test(params: list, data_path, trans):
-    if len(params) != 4:
+    number_of_test_params = 4
+    if len(params) != number_of_test_params:
         raise Exception()
     conv_type, batch_size_str, model_path = params[1:]
     if conv_type == 'conv':
@@ -51,7 +54,8 @@ def run_test(params: list, data_path, trans):
 
 
 def run_train(params: list, data_path, trans):
-    if len(params) != 6:
+    number_of_train_params = 6
+    if len(params) != number_of_train_params:
         raise Exception()
     conv_type, num_epochs_str, lr_str, batch_size_str, model_name = params[1:]
     if conv_type == 'conv':
