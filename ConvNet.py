@@ -18,7 +18,7 @@ class ConvNet(nn.Module):
     def forward(self, x):
         pass
 
-    def test_model(self, test_loader):
+    def test_model(self, test_loader, is_show_info=True):
         with torch.no_grad():
             correct = 0
             total = 0
@@ -29,14 +29,17 @@ class ConvNet(nn.Module):
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-            print(f'Test accuracy: {(correct / total) * 100} %')
+            if is_show_info:
+                print(f'Test accuracy: {(correct / total) * 100} %')
+            return correct / total
 
-    def train_model(self, train_loader, num_epochs):
+    def train_model(self, train_loader, test_loader, num_epochs):
         res_output_step = 100
         train_loader.device = self.device
         total_step = len(train_loader)
-        loss_list = []
-        acc_list = []
+        test_acc_list = []
+        train_acc_list = []
+
         for epoch in range(num_epochs):
             for i, (images, labels) in enumerate(train_loader):
                 images = images.to(self.device)
@@ -44,7 +47,6 @@ class ConvNet(nn.Module):
 
                 outputs = self(images)
                 loss = self.criterion(outputs, labels)
-                loss_list.append(loss.item())
 
                 self.optimizer.zero_grad()
                 loss.backward()
@@ -53,11 +55,16 @@ class ConvNet(nn.Module):
                 total = labels.size(0)
                 _, predicted = torch.max(outputs.data, 1)
                 correct = (predicted == labels).sum().item()
-                acc_list.append(correct / total)
 
                 if (i + 1) % res_output_step == 0:
                     print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'
                           .format(epoch + 1, num_epochs, i + 1, total_step, loss.item(), (correct / total) * 100))
+
+            train_acc = self.test_model(train_loader, False)
+            train_acc_list.append(train_acc)
+            test_acc = self.test_model(test_loader, False)
+            test_acc_list.append(test_acc)
+        return train_acc_list, test_acc_list
 
     def save_model(self, model_path):
         torch.save(self.state_dict(), model_path + '.ckpt')

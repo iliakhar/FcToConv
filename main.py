@@ -1,11 +1,32 @@
 import os.path
 import sys
+import matplotlib.pyplot as plt
+import numpy as np
 from torch.utils.data import DataLoader
 from torchvision import transforms
 import torchvision
 from FcConvNet import FcConvNet
 from FullConvNet import FullConvNet
 
+
+def create_plot(train_y: list, test_y: list, tittle=''):
+    x = np.array([i for i in range(1, len(test_y)+1)])
+    test_y = np.array(test_y)
+    train_y = np.array(train_y)
+
+    plt.plot(x, train_y, marker='o', markersize=4, label='test')
+    plt.plot(x, test_y, marker='o', markersize=4, label='train')
+
+    plt.xticks(np.arange(0, len(x)+1, 1))
+    plt.yticks(np.arange(0.9, 1.01, 0.01))
+    plt.grid()
+
+    plt.title(tittle)
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.legend()
+
+    plt.savefig('graph/' + tittle + '_graph.png', dpi=300, bbox_inches='tight')
 
 def run_test(params: list, data_path, trans):
     if len(params) != 4:
@@ -45,9 +66,14 @@ def run_train(params: list, data_path, trans):
 
     train_dataset = torchvision.datasets.MNIST(root=data_path, train=True, transform=trans, download=True)
     train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+    test_dataset = torchvision.datasets.MNIST(root=data_path, train=False, transform=trans)
+    test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
     model.set_lr(lr)
-    model.train_model(train_loader, num_epochs)
+    train_acc_list, test_acc_list = model.train_model(train_loader, test_loader, num_epochs)
     model.save_model(model_name)
+
+    tittle = 'Convnet' if conv_type == 'conv' else 'Full_Convnet'
+    create_plot(train_acc_list, test_acc_list, tittle)
 
 
 def main():
