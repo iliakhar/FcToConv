@@ -30,6 +30,7 @@ def create_plot(train_y: list, test_y: list, tittle=''):
 
     plt.savefig('graph/' + tittle + '_graph.png', dpi=300, bbox_inches='tight')
 
+
 def run_test(params: list, data_path, trans):
     number_of_test_params = 4
     if len(params) != number_of_test_params:
@@ -54,10 +55,10 @@ def run_test(params: list, data_path, trans):
 
 
 def run_train(params: list, data_path, trans):
-    number_of_train_params = 6
+    number_of_train_params = 7
     if len(params) != number_of_train_params:
         raise Exception()
-    conv_type, num_epochs_str, lr_str, batch_size_str, model_name = params[1:]
+    conv_type, num_epochs_str, lr_str, batch_size_str, folder, model_name = params[1:]
     if conv_type == 'conv':
         model = FcConvNet()
     elif conv_type == 'full_conv':
@@ -68,16 +69,19 @@ def run_train(params: list, data_path, trans):
     lr = float(lr_str)
     batch_size = max(1, int(batch_size_str))
 
+    if not os.path.isdir(folder):
+        raise Exception()
+
     train_dataset = torchvision.datasets.MNIST(root=data_path, train=True, transform=trans, download=True)
     train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
     test_dataset = torchvision.datasets.MNIST(root=data_path, train=False, transform=trans)
     test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
     model.set_lr(lr)
     train_acc_list, test_acc_list = model.train_model(train_loader, test_loader, num_epochs)
-    model.save_model(model_name)
+    model.save_model(folder+'/'+model_name)
 
     tittle = 'Convnet' if conv_type == 'conv' else 'Full_Convnet'
-    create_plot(train_acc_list, test_acc_list, tittle)
+    # create_plot(train_acc_list, test_acc_list, tittle)
 
 
 def main():
