@@ -81,7 +81,7 @@ def run_train(params: list, data_path, trans):
     model.save_model(folder+'/'+model_name)
 
     tittle = 'Convnet' if conv_type == 'conv' else 'Full_Convnet'
-    # create_plot(train_acc_list, test_acc_list, tittle)
+    create_plot(train_acc_list, test_acc_list, tittle)
 
 
 def main():
