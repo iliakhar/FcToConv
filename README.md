@@ -30,6 +30,12 @@
 
 ![full_convnet_graph](https://github.com/iliakhar/FcToConv/blob/master/graph/Full_Convnet_graph.png)
 
+Обученные модели лежат в папке - model;
+
+Построенные графики - в папке graph;
+
+Изображения с визуализацией нейронных сетей - в папке netron_res.
+
 ## Запуск
 ### Установка зависимостей для Windows
 Перейти в корневую папку и запусть:
